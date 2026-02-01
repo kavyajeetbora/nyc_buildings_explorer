@@ -2,12 +2,12 @@
 
 A lightweight, modern web dashboard that visualizes New York City building footprints from Overture Maps using dynamic vector tiles generated on-the-fly by DuckDB Spatial. No pre-generated MBTiles/PMTiles — tiles are created in real time from a DuckDB database, filtered server-side, and served directly to MapLibre GL JS.
 
-<video src="docs/Demo.mp4" 
-       controls 
-       autoplay 
-       loop 
-       muted 
-       style="max-width:60%; border-radius:8px;">
+<video src="https://github.com/user-attachments/assets/635b9c5d-c81f-4eed-ba5b-affc61ab4003"
+       controls
+       autoplay
+       loop
+       muted
+       style="max-width: 60%; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.15);">
   Your browser does not support the video tag.
 </video>
 
