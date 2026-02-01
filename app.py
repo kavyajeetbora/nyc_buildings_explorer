@@ -12,8 +12,8 @@ con = duckdb.connect(r"data\tiles.db", True, config)
 
 # Install spatial from wherever you built it
 #con.execute("INSTALL spatial from <some path>")
-
-con.execute("load spatial")
+con.execute("install spatial;")
+con.execute("load spatial;")
 
 # Tile endpoint to serve vector tiles
 @app.route('/tiles/<int:z>/<int:x>/<int:y>.pbf')
