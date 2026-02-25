@@ -1,0 +1,36 @@
+# Tile Caching Implementation Plan
+
+To make the tile rendering extremely fast, we can implement Edge Caching (via CDN) and Client-Side Browser caching. Because the DuckDB query `ST_AsMVT` computes geometry heavily on the fly, avoiding hitting the backend for the same tile is critical for map performance.
+
+## Proposed Changes
+
+We will modify the Flask service to add appropriate HTTP headers.
+
+### [app.py](file:///c:/Users/kavya/Downloads/PROJECTS/nyc_building_explorer/app.py)
+
+#### [MODIFY] [app.py](file:///c:/Users/kavya/Downloads/PROJECTS/nyc_building_explorer/app.py)(file:///c:/Users/kavya/Downloads/PROJECTS/nyc_building_explorer/app.py)
+Update the [get_tile](file:///c:/Users/kavya/Downloads/PROJECTS/nyc_building_explorer/app.py#19-46) route to append a `Cache-Control` header to the response.
+
+```python
+# Before
+return flask.Response(tile, mimetype='application/x-protobuf')
+
+# After
+response = flask.Response(tile, mimetype='application/x-protobuf')
+# Cache publicly for 24 hours (86400 seconds)
+# This tells browsers AND edge CDNs (like Cloudflare, Nginx, Varnish) to cache the tile
+response.headers['Cache-Control'] = 'public, max-age=86400' 
+return response
+```
+
+> [!TIP]
+> If you deploy this behind a CDN (like Cloudflare) or an Nginx reverse proxy, the `public` directive ensures the proxy caches the `.pbf` files at the edge. This means 99% of users panning around the map will never actually hit your Python DuckDB server.
+
+## Verification Plan
+
+### Manual Verification
+1. Open the browser's Developer Tools (Network Tab).
+2. Pan the map.
+3. Select a `.pbf` network request.
+4. Verify the Response Headers contain `Cache-Control: public, max-age=86400`.
+5. Pan away and pan back to the same spot; verify the network request shows [(disk cache)](file:///c:/Users/kavya/Downloads/PROJECTS/nyc_building_explorer/app.py#282-285) or [(memory cache)](file:///c:/Users/kavya/Downloads/PROJECTS/nyc_building_explorer/app.py#282-285) instead of hitting the server again.
